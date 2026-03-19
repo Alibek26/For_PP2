@@ -12,7 +12,7 @@ print("-" * 50, "-" * 20, "-" * 6, "-" * 6)
 
 # Iterate over each interface
 for item in data['imdata']:
-    intf = item['ethpmPhysIf']['attributes']
+    intf = item['l1PhysIf']['attributes']
     dn = intf['dn']
     descr = intf['descr']
     speed = intf['speed']

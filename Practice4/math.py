@@ -1,8 +1,8 @@
 #Exercise 1
 import math
-degree = float(input("Input degree: ")) #15
+#degree = float(input("Input degree: ")) #15
 
-radian = math.radians(degree) 
+radian = math.radians(15) 
 print(f"Output radian: {radian:.6f}") #Output radian: 0.261799
 
 #Exercise 2
