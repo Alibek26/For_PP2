@@ -2,71 +2,89 @@ import pygame
 
 pygame.init()
 
-# Screen settings
+# Screen setup
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Paint")
 
 clock = pygame.time.Clock()
 
-# Default drawing color and mode
-color = (0, 0, 0)
-mode = "draw"
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 
+current_color = BLACK  # текущий цвет
+
+# Fill background with white
+screen.fill(WHITE)
+
+# Modes and state
+mode = "draw"
 drawing = False
 start_pos = (0, 0)
 
 running = True
-
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        # Switch modes with keyboard
+        # Switch modes and colors
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
-                mode = "rect"   # rectangle mode
+                mode = "rect"
             elif event.key == pygame.K_c:
-                mode = "circle" # circle mode
+                mode = "circle"
             elif event.key == pygame.K_e:
-                mode = "eraser" # eraser mode
+                mode = "eraser"
             elif event.key == pygame.K_b:
-                mode = "draw"   # free draw mode
+                mode = "draw"
 
-        # Mouse pressed
+            # Color selection
+            elif event.key == pygame.K_1:
+                current_color = BLACK
+            elif event.key == pygame.K_2:
+                current_color = RED
+            elif event.key == pygame.K_3:
+                current_color = GREEN
+            elif event.key == pygame.K_4:
+                current_color = BLUE
+            elif event.key == pygame.K_5:
+                current_color = YELLOW
+
+        # Mouse button pressed
         if event.type == pygame.MOUSEBUTTONDOWN:
             drawing = True
             start_pos = event.pos
 
-        # Mouse released
+        # Mouse button released
         if event.type == pygame.MOUSEBUTTONUP:
             drawing = False
 
-            # Draw rectangle
+            x1, y1 = start_pos
+            x2, y2 = event.pos
+
             if mode == "rect":
-                x, y = start_pos
-                w = event.pos[0] - x
-                h = event.pos[1] - y
-                pygame.draw.rect(screen, color, (x, y, w, h), 2)
+                rect = pygame.Rect(x1, y1, x2 - x1, y2 - y1)
+                pygame.draw.rect(screen, current_color, rect, 2)
 
-            # Draw circle
-            if mode == "circle":
-                x, y = start_pos
-                r = int(((event.pos[0]-x)**2 + (event.pos[1]-y)**2)**0.5)
-                pygame.draw.circle(screen, color, (x, y), r, 2)
+            elif mode == "circle":
+                radius = int(((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5)
+                pygame.draw.circle(screen, current_color, (x1, y1), radius, 2)
 
-    # While holding mouse button
+    # Drawing while holding mouse button
     if drawing:
         mx, my = pygame.mouse.get_pos()
 
-        # Free drawing
         if mode == "draw":
-            pygame.draw.circle(screen, color, (mx, my), 3)
+            pygame.draw.circle(screen, current_color, (mx, my), 3)
 
-        # Eraser (draw with white color)
-        if mode == "eraser":
-            pygame.draw.circle(screen, (255,255,255), (mx, my), 10)
+        elif mode == "eraser":
+            pygame.draw.circle(screen, WHITE, (mx, my), 10)
 
     pygame.display.flip()
     clock.tick(60)

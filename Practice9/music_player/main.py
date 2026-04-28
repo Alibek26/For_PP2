@@ -1,68 +1,66 @@
 import pygame
+import os
 from player import MusicPlayer
 
-def draw_text(screen, text, x, y, font):
-    # Render and draw text on screen
-    img = font.render(text, True, (255, 255, 255))
-    screen.blit(img, (x, y))
+pygame.init()
 
-def main():
-    pygame.init()
+WIDTH, HEIGHT = 600, 300
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Music Player")
 
-    # Create window
-    screen = pygame.display.set_mode((600, 400))
-    pygame.display.set_caption("Music Player")
+font = pygame.font.SysFont(None, 36)
+clock = pygame.time.Clock()
 
-    # Font for UI text
-    font = pygame.font.SysFont("Arial", 24)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+music_path = os.path.join(BASE_DIR, "music")
 
-    # Create music player instance
-    player = MusicPlayer("music")
+player = MusicPlayer(music_path)
 
-    clock = pygame.time.Clock()
-    running = True
+running = True
 
-    while running:
-        screen.fill((30, 30, 30))
+def draw_ui():
+    screen.fill((255, 255, 255))
 
-        # Handle events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+    title = font.render("Music Player", True, (0, 0, 0))
+    screen.blit(title, (200, 20))
+
+    track = font.render(f"Track: {player.get_current_track_name()}", True, (0, 0, 0))
+    screen.blit(track, (50, 100))
+
+    # 🔥 прогресс бар
+    progress = player.get_progress()
+
+    bar_x, bar_y = 50, 150
+    bar_width, bar_height = 500, 10
+
+    pygame.draw.rect(screen, (200, 200, 200), (bar_x, bar_y, bar_width, bar_height))
+    pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width * progress, bar_height))
+
+    controls = font.render("P-Play S-Stop N-Next B-Back Q-Quit", True, (0, 0, 0))
+    screen.blit(controls, (50, 200))
+
+    pygame.display.flip()
+
+
+while running:
+    draw_ui()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                player.play()
+            elif event.key == pygame.K_s:
+                player.stop()
+            elif event.key == pygame.K_n:
+                player.next_track()
+            elif event.key == pygame.K_b:
+                player.previous_track()
+            elif event.key == pygame.K_q:
                 running = False
 
-            if event.type == pygame.KEYDOWN:
+    clock.tick(60)
 
-                # Play music
-                if event.key == pygame.K_p:
-                    player.play()
-
-                # Stop music
-                elif event.key == pygame.K_s:
-                    player.stop()
-
-                # Next track
-                elif event.key == pygame.K_n:
-                    player.next_track()
-
-                # Previous track
-                elif event.key == pygame.K_b:
-                    player.prev_track()
-
-                # Quit program
-                elif event.key == pygame.K_q:
-                    running = False
-
-        # UI display
-        draw_text(screen, "Music Player", 20, 20, font)
-        draw_text(screen, f"Track: {player.get_current_track()}", 20, 80, font)
-        draw_text(screen, f"Status: {player.get_status()}", 20, 120, font)
-
-        draw_text(screen, "Controls: P=Play | S=Stop | N=Next | B=Back | Q=Quit", 20, 200, font)
-
-        pygame.display.flip()
-        clock.tick(60)
-
-    pygame.quit()
-
-if __name__ == "__main__":
-    main()
+pygame.quit()
